@@ -1,6 +1,4 @@
 
-module Lib where
-import Text.Show.Functions
 
 data Jugador = UnJugador {
   nombre :: String,
@@ -49,7 +47,72 @@ hierros :: Int -> Palo
 hierros n habilidad =  UnTiro{velocidad=fuerzaJugador habilidad*n,precision=precisionJugador habilidad `div` n,altura=n-3 `max` 0}
 
 --PÚNTO 1.b)
-type Palos = [Palo]
+palos :: [Palo]
 palos = [putter,madera] ++ map hierros [1..10]
 
 --PUNTO 2) 
+golpe :: Jugador -> Palo -> Tiro
+golpe  jugador palo = (palo.habilidad) jugador
+-- golpe jugador palo = palo (habilidad jugador)
+
+
+--PUNTO 3)
+
+data Obstaculo = Obstaculo{
+    puedeSuperarObstaculo :: Tiro -> Bool,
+    efectoLuegoDeSuperar :: Tiro -> Tiro
+}
+
+intentarSuperarObstaculo :: Obstaculo -> Tiro -> Tiro
+intentarSuperarObstaculo obstaculo tiroOriginal
+    | puedeSuperarObstaculo obstaculo tiroOriginal  = efectoLuegoDeSuperar obstaculo tiroOriginal
+    | otherwise = tiroNulo
+
+tunelConRampita :: Obstaculo
+tunelConRampita = Obstaculo superaTunelConRampita efectoTunelConRampita
+
+laguna :: Int -> Obstaculo
+laguna alturaLaguna= Obstaculo superaLaguna (efectoLaguna alturaLaguna)
+
+hoyo :: Obstaculo
+hoyo = Obstaculo superaHoyo efectoHoyo
+
+superaTunelConRampita :: Tiro -> Bool
+superaTunelConRampita tiro = precision tiro > 90 && altura tiro == 0
+
+efectoTunelConRampita :: Tiro -> Tiro
+efectoTunelConRampita tiro = UnTiro{velocidad=velocidad tiro*2,precision=100,altura=0}
+ 
+superaLaguna :: Tiro -> Bool
+superaLaguna tiro = velocidad tiro > 80 && (between 1 5 .altura) tiro
+
+efectoLaguna :: Int -> Tiro -> Tiro
+efectoLaguna alturaLaguna tiro=UnTiro{altura=altura tiro `div` alturaLaguna}
+
+superaHoyo :: Tiro -> Bool
+superaHoyo tiro = (between 5 20.velocidad) tiro && precision tiro > 95
+
+efectoHoyo :: Tiro -> Tiro
+efectoHoyo _ = tiroNulo
+
+tiroNulo :: Tiro
+tiroNulo = UnTiro 0 0 0
+
+--PUNTO 4a)
+palosUtiles :: Jugador -> Obstaculo -> [Palo]
+palosUtiles jugador obstaculo = filter (leSirveParaSuperar jugador obstaculo) palos 
+
+leSirveParaSuperar :: Jugador -> Obstaculo -> Palo -> Bool
+leSirveParaSuperar jugador obstaculo = puedeSuperarObstaculo obstaculo.golpe jugador 
+
+
+--puedeSuperarObstaculo  :: Tiro -> Bool y golpe :: Jugador -> Pal -> Tiro
+
+--PUNTO 4b)
+
+
+
+
+
+
+

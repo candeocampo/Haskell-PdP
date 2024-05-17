@@ -66,7 +66,7 @@ type Actividad = Personaje -> Personaje
 type Actividades = [Actividad]
 
 
-unaActividadResultaDecisivaParaLograrUnLogro :: Actividades -> Logro -> Personaje -> Bool
+{- unaActividadResultaDecisivaParaLograrUnLogro :: Actividades -> Logro -> Personaje -> Bool
 unaActividadResultaDecisivaParaLograrUnLogro actividad logro personaje  
     | logro personaje = False
     | otherwise = (logro.actividades) personaje
@@ -76,4 +76,4 @@ actividadDecisiva :: Actividades -> Logro -> Personaje -> Personaje
 actividadDecisiva [] logro personaje = personaje
 actividadDecisiva (actividad:actividades) logro personaje  
     | unaActividadResultaDecisivaParaLograrUnLogro actividad logro personaje = actividad personaje 
-    | otherwise = actividadDecisiva actividades logro personaje
+    | otherwise = actividadDecisiva actividades logro personaje -}
