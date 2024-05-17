@@ -48,3 +48,32 @@ homero = Personaje "Homero Simpson" 50 100
 skinner = Personaje "Skinner" 10 500
 lisa = Personaje "Lisa Simpson" 100 0
 
+srBurns :: Personaje
+srBurns = Personaje "Sr.Burns" 0 1000000000
+
+type Logro = Personaje -> Bool
+
+serMillonario :: Logro 
+serMillonario personaje = dinero personaje > dinero srBurns
+
+alegrarseF :: Int -> Logro 
+alegrarseF valor personaje = valor > felicidad personaje
+
+programaKrosti :: Logro 
+programaKrosti personaje = dinero personaje >= 10
+
+type Actividad = Personaje -> Personaje
+type Actividades = [Actividad]
+
+
+unaActividadResultaDecisivaParaLograrUnLogro :: Actividades -> Logro -> Personaje -> Bool
+unaActividadResultaDecisivaParaLograrUnLogro actividad logro personaje  
+    | logro personaje = False
+    | otherwise = (logro.actividades) personaje
+
+
+actividadDecisiva :: Actividades -> Logro -> Personaje -> Personaje
+actividadDecisiva [] logro personaje = personaje
+actividadDecisiva (actividad:actividades) logro personaje  
+    | unaActividadResultaDecisivaParaLograrUnLogro actividad logro personaje = actividad personaje 
+    | otherwise = actividadDecisiva actividades logro personaje
