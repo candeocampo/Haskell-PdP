@@ -109,10 +109,25 @@ leSirveParaSuperar jugador obstaculo = puedeSuperarObstaculo obstaculo.golpe jug
 --puedeSuperarObstaculo  :: Tiro -> Bool y golpe :: Jugador -> Pal -> Tiro
 
 --PUNTO 4b)
+--BONUS:
+--takeWhile :: (a -> Bool) -> [a] -> [a]
 
+obstaculosConsecutivosQueSupera:: Tiro -> [Obstaculo] -> Int
+obstaculosConsecutivosQueSupera tiro obstaculos = (length . takeWhile(\(obstaculo,tiroQueLlega)->puedeSuperarObstaculo obstaculo tiroQueLlega).zip obstaculos.tiroSucesivos tiro)obstaculos
 
+tiroSucesivos :: Tiro -> [Obstaculo] -> [Tiro]
+--tiroSucesivos tiroOriginal obstaculos= map (\ obstaculo-> efectoLuegoDeSuperar obstaculo tiroOriginal) obstaculos
+tiroSucesivos tiroOriginal obstaculos = foldl (\tirosGenerados obstaculo -> tirosGenerados ++ [efectoLuegoDeSuperar obstaculo (last tirosGenerados)])[tiroOriginal] obstaculos
 
+--DE FORMA RECURSIVA:
+obstaculosConsecutivosQueSupera' :: Tiro -> [Obstaculo] -> Int
+obstaculosConsecutivosQueSupera' tiro [] = 0
+obstaculosConsecutivosQueSupera' tiro (obstaculo:obstaculos) 
+  | puedeSuperarObstaculo obstaculo tiro = 1 + obstaculosConsecutivosQueSupera' (efectoLuegoDeSuperar obstaculo tiro) obstaculos
+  | otherwise = 0 
 
-
+--PUNTO 4c)
+paloMasUtil :: Jugador -> [Obstaculo] -> Palo
+paloMasUtil jugador obstaculos = maximoSegun (flip obstaculosConsecutivosQueSupera obstaculos.golpe jugador) palos
 
 
