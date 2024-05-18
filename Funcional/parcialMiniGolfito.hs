@@ -131,3 +131,14 @@ paloMasUtil :: Jugador -> [Obstaculo] -> Palo
 paloMasUtil jugador obstaculos = maximoSegun (flip obstaculosConsecutivosQueSupera obstaculos.golpe jugador) palos
 
 
+--PUNTO 5)
+
+jugadorDeTorneo = fst
+puntosGanados = snd
+
+padresQuePierdenApuesta :: [(Jugador,Puntos)] -> [String]
+padresQuePierdenApuesta puntosDeTorneo = (map(padre.jugadorDeTorneo).filter(not . gano puntosDeTorneo)) puntosDeTorneo
+
+gano ::  [(Jugador,Puntos)] ->  [(Jugador,Puntos)] -> Bool
+gano puntosDeTorneo puntosJugador 
+  = (all((< puntosGanados puntosJugador).puntosGanados).filter (/= puntosJugador)) puntosDeTorneo
