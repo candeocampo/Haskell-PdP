@@ -88,3 +88,48 @@ sumarHorrocruxSegun :: Hechizo -> Postre -> Mago -> Mago
 sumarHorrocruxSegun hechizo postre mago
     | esElMismoResultado hechizo postre = sumarHorrocrux mago
     | otherwise = mago
+
+--PUNTO 2B)
+
+mejorHechizo :: Postre -> Mago -> Hechizo
+mejorHechizo postre mago = foldl1 (elMejorEntre postre) (hechizosAprendidos mago)
+
+elMejorEntre :: Postre -> Hechizo -> Hechizo -> Hechizo
+elMejorEntre postre hechizo1 hechizo2 
+    | postreConMasSabores postre hechizo1 hechizo2 = hechizo1
+    | otherwise = hechizo2
+
+postreConMasSabores :: Postre -> Hechizo -> Hechizo -> Bool
+postreConMasSabores postre hechizo1 hechizo2 = (length.sabores.hechizo1) postre > (length.sabores.hechizo2) postre
+
+--PUNTO 3A)
+
+mesaInfinita :: [Postre]
+mesaInfinita = repeat bizcocho
+
+magoInf :: Mago
+magoInf = UnMago{hechizosAprendidos=repeat avadaKedavra,cantidadHorrorcruxex=0}
+
+--PUNTO 3B)
+-- Suponiendo que hay una mesa con infinitos postres, y pregunto si algún hechizo los deja listos
+-- ¿Existe alguna consulta que pueda hacer para que me sepa dar una respuesta? Justificar
+-- conceptualmente.
+
+{-
+Verdadero, existe la consulta:
+Prelude> estanListos avadaKedabra mesaInfinita
+La ejecución devuelve falso pues debido a la evaluación diferida, el all cuando encuentra el primer postre que no está listo ya retorna y no requiere construir la lista infinita.
+-}
+
+
+
+
+--PUNTO 3C)
+-- Suponiendo que un mago tiene infinitos hechizos ¿Existe algún caso en el que se puede
+-- encontrar al mejor hechizo? Justificar conceptualmente
+
+{-
+No existe ninguna forma de conocer el mejor hechizo del mago porque para hacerlo hay que evaluar todos los elementos lista, aún teniendo lazy evaluation.
+-}
+
+
