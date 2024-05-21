@@ -1,3 +1,4 @@
+
 data Postre = UnPostre{
     sabores :: [Sabores],
     peso :: Int,
@@ -66,3 +67,24 @@ promedioPostresListos listaPostres= (promedioPostre . map peso .filter unPostreL
 --acá podrias simplificar lo de "listaPostres"
 
 --PARTE 2) MAGOS
+data Mago = UnMago{
+    hechizosAprendidos :: [Hechizo],
+    cantidadHorrorcruxex :: Int
+}deriving Show
+
+claseCocina :: Hechizo -> Postre -> Mago ->  Mago
+claseCocina hechizo postre mago = sumarHorrocrux hechizo postre.practicaMago hechizo
+
+practicaMago :: Mago -> Hechizo -> Mago
+practicaMago mago hechizoPractica= mago{hechizosAprendidos=hechizoPractica:hechizosAprendidos mago}
+
+esElMismoResultado :: Hechizo -> Postre -> Bool
+esElMismoResultado hechizo postre = hechizo postre == avadaKedavra postre
+
+sumarHorrocrux :: Mago
+sumarHorrocrux mago = mago{cantidadHorrorcruxex=cantidadHorrorcruxex mago + 1}
+
+sumarHorrocruxSegun :: Hechizo -> Postre -> Mago -> Mago
+sumarHorrocruxSegun hechizo postre mago
+    | esElMismoResultado hechizo postre = sumarHorrocrux mago
+    | otherwise = mago
