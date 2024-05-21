@@ -10,18 +10,24 @@ type Sabores = String
 bizcocho :: Postre
 bizcocho = UnPostre ["Borracho de Fruta","Crema"] 100 25
 
+tarta :: Postre
+tarta = UnPostre ["Melaza"] 50 0
+
+--PUNTO B)
+
 type Hechizo = Postre -> Postre
 
 cambiarPesoPostre :: Int -> Hechizo
-cambiarPesoPostre valor postre = UnPostre{ peso = (peso postre * (100 - valor)) `div` 100 }
+cambiarPesoPostre valor postre = postre{ peso = (peso postre * (100 - valor)) `div` 100 }
+
 cambiarTemperaturaPostre :: Int -> Hechizo
-cambiarTemperaturaPostre nuevaTemp postre = UnPostre{temperatura=nuevaTemp}
+cambiarTemperaturaPostre nuevaTemp postre = postre{temperatura=nuevaTemp}
 
 agregarNuevoSabor :: String -> Postre -> Postre
-agregarNuevoSabor nuevoSabor postre = UnPostre{sabores=nuevoSabor:sabores postre}
+agregarNuevoSabor nuevoSabor postre = postre{sabores=nuevoSabor:sabores postre}
 
 perderSabores :: Hechizo
-perderSabores postre = UnPostre{sabores=[]}
+perderSabores postre = postre{sabores=[]}
 
 incendio :: Hechizo
 incendio = cambiarTemperaturaPostre 1 . cambiarPesoPostre 5
@@ -40,3 +46,23 @@ riddikulus saborNuevo = agregarNuevoSabor (reverse saborNuevo)
 
 avadaKedavra :: Hechizo
 avadaKedavra = inmmobulus . perderSabores
+
+--PUNTO C)
+estaCongelado :: Postre -> Bool
+estaCongelado = (>0).temperatura
+
+unPostreListo :: Postre -> Bool
+unPostreListo postre = peso postre > 0 && not(estaCongelado postre) && not(null (sabores postre))
+
+estaraListoPostre :: Hechizo -> [Postre] -> Bool
+estaraListoPostre hechizo listaPostre = all (unPostreListo.hechizo) listaPostre
+
+--PUNTO D)
+promedioPostre :: [Int] -> Int
+promedioPostre pesos = (sum pesos)`div`(length pesos)
+
+promedioPostresListos :: [Postre] -> Int
+promedioPostresListos listaPostres= (promedioPostre . map peso .filter unPostreListo) listaPostres
+--acá podrias simplificar lo de "listaPostres"
+
+--PARTE 2) MAGOS
