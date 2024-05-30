@@ -107,14 +107,49 @@ excursionEnIslaVecina _  = irALaPlaya
 
 
 --3.a)
+turistaHaceTour :: Turista -> Tour -> Turista
+turistaHaceTour turista tour = foldl (flip hacerExcursion)  (bajarStress (length tour) turista) tour
+
+--3.b)
+tourConvincente :: Turista -> [Tour] -> Bool
+tourConvincente turista listaTour = any (esConvincente turista) listaTour
+
+esConvincente :: Turista -> Tour -> Bool
+esConvincente turista = any(dejaAcompaniado turista).excursionesDesestresantes turista
+
+dejaAcompaniado :: Turista  -> Excursion -> Bool
+dejaAcompaniado turista  = not.viajaSolo.flip hacerExcursion turista
+ 
+--3.c)
+efectividadTour :: Tour -> [Turista] -> Int
+efectividadTour tour  = sum . map (espiritualidadAportada tour).filter(flip esConvincente tour)
+
+espiritualidadAportada :: Tour -> Turista -> Int
+espiritualidadAportada tour = negate.espiritualidadTurista tour
+
+espiritualidadTurista :: Tour -> Turista -> Int
+espiritualidadTurista tour turista = deltaSegun nivelCansancioEstres (turistaHaceTour turista tour) turista
 
 
+nivelCansancioEstres :: Turista -> Int
+nivelCansancioEstres turista = stress turista + cansancio turista
 
+--4.a)
 
+playaInfinita :: Tour
+playaInfinita = completo : repeat irALaPlaya
 
+--4.b)
+-- ¿Se puede saber si ese tour es convicente para Ana? Y beto? Justificar
+--Rta:
+{- Para Ana sí porque la primer actividad ya es desestresante y siempre está acompañada.
+Con Beto no se cumple ninguna de las 2 condiciones y el algoritmo diverge. -}
 
-
-
+--4.c
+-- c)
+-- ¿Existe algún caso donde se pueda conocer la efectividad de este tour? Justificar.
+--Rta:
+{- No, solamente funciona para el caso que se consulte con una lista vacía de turista, que dará siempre 0. -}
 
 
 
