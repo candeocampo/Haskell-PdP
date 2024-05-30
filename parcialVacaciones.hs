@@ -89,10 +89,24 @@ esDesestresante turista = (<= -3) . deltaExcursionSegun stress turista
 
 --PARTE 3)
 
+type Tour = [Excursion]
+type Marea = String
+
+completo :: Tour
+completo = [caminar 20, apreciarElementoDelPaisaje "cascada", caminar 40, irALaPlaya ,agregarIdioma "melcacquiano"]
+
+ladoB :: Excursion -> Tour
+ladoB excursion = [paseoEnBarco "aguas tranquilas", excursion, caminar 120]
+
+islaVecina :: Marea -> Tour
+islaVecina mareaVecina =  [paseoEnBarco "mareaVecina", excursionEnIslaVecina mareaVecina, paseoEnBarco "mareaVecina"]
+
+excursionEnIslaVecina :: Marea -> Excursion
+excursionEnIslaVecina "Fuerte" = apreciarElementoDelPaisaje "lago"
+excursionEnIslaVecina _  = irALaPlaya
 
 
-
-
+--3.a)
 
 
 
