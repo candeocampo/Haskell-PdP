@@ -15,6 +15,7 @@ data Persona = Personaje{
     busquedas :: [Busqueda]
 } 
 
+ordenarSegun :: (a -> a -> Bool) -> [a] -> [a]
 ordenarSegun _ [] = []
 ordenarSegun criterio (x:xs) = 
     (ordenarSegun criterio . filter(not.criterio x)) xs ++ 
@@ -30,4 +31,42 @@ deptosEjemplo = [
     Depto 1 45 3500 "Villa Urquiza",
     Depto 2 50 5000 "Palermo",
     Depto 1 45 5500 "Recoleta"]
+
+--PUNTO 1.a)
+mayor :: Ord a => (b -> a) -> b -> b -> Bool
+mayor f x y = f x > f y
+
+menor :: Ord a => (b -> a) -> b -> b -> Bool
+menor f x y = f x < f y 
+
+--PUNTO 1.b)
+--ordenarSegun (mayor (length)) (lista)
+
+--PUNTO 2.a)
+ubicadoEn :: [Barrio] -> Requisito
+ubicadoEn listaBarrio depto = elem (barrio depto) listaBarrio
+
+barrio1 :: [Barrio]
+barrio1 = ["Palermo","Recoleta"]
+
+--PUNTO 2.b)
+cumpleRango :: (Depto -> Int )-> Int -> Int -> Requisito
+cumpleRango funcion cotaSup contaInf = (between cotaSup contaInf.funcion)
+
+--PUNTO 3.a)
+cumpleBusqueda :: Busqueda -> Requisito 
+cumpleBusqueda listaRequisitos depto = all (\req -> req depto) listaRequisitos
+
+--cumpleRequisito :: Depto -> Requisito
+--cumpleRequisito depto requisito = (requisito depto)
+-- cumpleBusqueda listaRequisitos depto = all (cumpleRequisito depto) listaRequisitos
+
+
+
+
+
+
+
+
+
 
