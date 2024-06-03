@@ -20,9 +20,6 @@ maximoSegun f = foldl1 (mayorSegun f)
     | otherwise = b
 -}
 
-deltaSegun ponderacion transformacion valor = abs ((ponderacion . transformacion) valor - ponderacion valor)
-
-
 --Casos de Prueba
 investigador1 :: Investigador
 investigador1  = Investigador "Candela" 60 [item1] ["Perder","Morir"]
@@ -76,9 +73,13 @@ esMismoNombre :: Item -> Item -> Bool
 esMismoNombre item1 item2 = nombreItem item1 == nombreItem item2
 
 --3)
+liderInvestigador' :: [Investigador] -> Investigador
+liderInvestigador' [investigador] = investigador
+liderInvestigador' (investigador1:investigador2:listaInvestigadores) = mayorSegun potencialInvestigador investigador1 investigador2
+
 liderInvestigador :: [Investigador] -> Investigador
-liderInvestigador [investigador] = investigador
-liderInvestigador (investigador1:investigador2:listaInvestigadores) = mayorSegun potencialInvestigador investigador1 investigador2
+liderInvestigador investigadores = maximoSegun potencialInvestigador investigadores
+
 
 mayorSegun f a b 
     | cordura (f a) > cordura (f b) = a 
@@ -97,8 +98,9 @@ experiencia investigador = 1 + 3 * length (sucesosEvitados investigador)
 
 --4.a)
 
+deltaSegun ponderacion transformacion valor = abs ((ponderacion . transformacion) valor - ponderacion valor)
 
-
+deltaSegunCordura cordura enloquezca valor = abs ((cordura . enloquezca) valor - cordura valor)
 
 
 
