@@ -10,17 +10,10 @@ data Depto = Depto{
     barrio :: Barrio
 }deriving(Show,Eq)
 
-data Persona = Personaje{
+data Persona = Persona{
     mail :: Mail,
     busquedas :: [Busqueda]
 } 
-
-ordenarSegun :: (a -> a -> Bool) -> [a] -> [a]
-ordenarSegun _ [] = []
-ordenarSegun criterio (x:xs) = 
-    (ordenarSegun criterio . filter(not.criterio x)) xs ++ 
-    [x] ++
-    (ordenarSegun criterio . filter (criterio x)) xs
 
 between cotaInferior cotaSuperior valor = 
     valor <= cotaSuperior && valor >= cotaInferior
@@ -54,14 +47,31 @@ cumpleRango :: (Depto -> Int )-> Int -> Int -> Requisito
 cumpleRango funcion cotaSup contaInf = (between cotaSup contaInf.funcion)
 
 --PUNTO 3.a)
-cumpleBusqueda :: Busqueda -> Requisito 
-cumpleBusqueda listaRequisitos depto = all (\req -> req depto) listaRequisitos
+cumpleBusqueda :: Depto -> Busqueda -> Bool
+cumpleBusqueda depto listaRequisitos  = all (\req -> req depto) listaRequisitos
 
 --cumpleRequisito :: Depto -> Requisito
 --cumpleRequisito depto requisito = (requisito depto)
 -- cumpleBusqueda listaRequisitos depto = all (cumpleRequisito depto) listaRequisitos
 
+--PUNTO 3.b)
 
+buscar :: Busqueda -> (Depto -> Depto -> Bool )-> [Depto] -> [Depto]
+buscar busqueda criterio deptos = (ordenarSegun criterio.filter(flip cumpleBusqueda busqueda)) deptos
+
+ordenarSegun _ [] = []
+ordenarSegun criterio (x:xs) = 
+    (ordenarSegun criterio . filter(not.criterio x)) xs ++ 
+    [x] ++
+    (ordenarSegun criterio . filter (criterio x)) xs
+
+
+-- PUNTO 4)
+mailsDePersonasInterasadas :: Depto -> [Persona] -> [Mail]
+mailsDePersonasInterasadas depto personas = (map mail . filter (estaInteresada depto)) personas
+
+estaInteresada :: Depto -> Persona -> Bool
+estaInteresada depto persona = any(cumpleBusqueda depto) (busquedas persona)
 
 
 
