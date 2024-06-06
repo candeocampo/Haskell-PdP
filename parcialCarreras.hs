@@ -1,5 +1,4 @@
 
-
 data Auto = Auto{
     color :: String,
     velocidad :: Int,
@@ -7,6 +6,9 @@ data Auto = Auto{
 }deriving (Show,Eq)
 
 type Carrera = [Auto]
+
+autoA :: Auto
+autoA = Auto "Rosa" 100 150
 
 -- PUNTO 1
 --1.a)
@@ -39,22 +41,66 @@ puesto auto = (+ 1).(length.filter (not.(leVaGanando auto)))
 type EstadoAuto = Auto -> Auto 
 
 corra :: Int -> Auto -> Auto 
-corra tiempo auto = auto{distanciaRecorrida=(distanciaRecorrida auto + tiempo)*velocidad auto}
+corra tiempo auto = auto{distanciaRecorrida=distanciaRecorrida auto + (tiempo *velocidad auto)}
 
 --2.b)
+type Modificador = Int -> Int 
 
+modificador1 :: Modificador
+modificador1 100 = 30
 
+--i)
+alterarVelocidad :: Modificador -> Auto -> Auto
+alterarVelocidad modificador auto = auto{velocidad=(modificador.velocidad)auto}
 
+--ii)
+bajarVelocidad :: Int -> Auto -> Auto
+bajarVelocidad valor auto = alterarVelocidad(max 0 . subtract valor) auto
 
+-- PUNTO 3
+afectarALosQueCumplen :: (a -> Bool) -> (a -> a) -> [a] -> [a]
+afectarALosQueCumplen criterio efecto lista
+    = (map efecto . filter criterio) lista ++ filter (not.criterio) lista
 
+type PowerUps = Auto -> Carrera -> Carrera 
 
+terremoto :: PowerUps
+terremoto autoGatilla  = afectarALosQueCumplen (estaCerca autoGatilla) (bajarVelocidad 50) 
 
+miguelitos :: Int -> PowerUps
+miguelitos valor autoGatilla  = afectarALosQueCumplen (leVaGanando autoGatilla) (bajarVelocidad valor)
 
+jetPack :: Int -> PowerUps
+jetPack tiempo autoGatilla carrera = afectarALosQueCumplen (==autoGatilla) (alterarVelocidad (`div`2).corra tiempo. alterarVelocidad (*2)) carrera
+ 
+-- PUNTO 4)
 
+type Eventos = Carrera -> Carrera
+type Color = String
 
+--4.a)
 
+simularCarrera :: Carrera -> [Carrera -> Carrera] -> [(Int, Color)]
+simularCarrera carrera eventos = (tablaDePosiciones . procesarEventos eventos) carrera
 
+tablaDePosiciones :: Carrera -> [(Int, Color)]
+tablaDePosiciones carrera = map(entradaDeTabla carrera) carrera
 
+entradaDeTabla :: Carrera -> Auto -> (Int, Color)
+entradaDeTabla carrera auto = (puesto auto carrera, color auto)
+
+procesarEventos :: [Carrera -> Carrera] -> Carrera -> Carrera 
+procesarEventos eventos carreraInicial = foldl (\carreraInicial eventos -> eventos carreraInicial) carreraInicial eventos
+
+--4.b)
+correnTodos:: Int -> Eventos
+correnTodos tiempo carrera = map (corra tiempo) carrera
+
+usaPowerUp :: PowerUps -> Color -> Eventos 
+usaPowerUp powerup colorAuto carrera = powerup (find ((==colorAuto).color) carrera) carrera
+
+find :: (c -> Bool) -> [c] -> c
+find cond = head.filter cond
 
 
 
