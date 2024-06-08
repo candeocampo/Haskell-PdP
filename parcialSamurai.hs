@@ -99,12 +99,29 @@ katanaMagica = Elemento{
     defensa = causarDanio' 100
 }
 
+-- PUNTO 4
 
+luchar :: Personaje -> Personaje -> (Personaje, Personaje)
+luchar atacante defensor 
+    | muere atacante = (defensor,atacante)
+    | otherwise = luchar proximoAtacante proximoDefensor
+    where proximoAtacante = usarElementos ataque defensor (elementos atacante)
+          proximoDefensor = usarElementos defensa atacante (elementos atacante)
 
+usarElementos :: (Elemento -> Personaje -> Personaje) -> Personaje -> [Elemento] -> Personaje
+usarElementos funcion personaje elementos = foldl afectar personaje (map funcion elementos)
 
+afectar personaje funcion = funcion personaje
 
+afectar' = flip ($)
 
+-- Punto 5 (inferencia)
+f x y z
+    | y 0 == z = map (fst.x z)
+    | otherwise = map (snd.x (y 0))
 
+f :: (Eq t1, Num t2) =>
+     (t1 -> a1 -> (a2, a2)) -> (t2 -> t1) -> t1 -> [a1] -> [a2]
 
 
 
