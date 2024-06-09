@@ -27,11 +27,6 @@ type Puntos = Int
 -- Funciones útiles
 between n m x = elem x [n .. m]
 
-maximoSegun f = foldl1 (mayorSegun f)
-mayorSegun f a b
-  | f a > f b = a
-  | otherwise = b
-
 --PUNTO 1.a)
 type Palo = Habilidad -> Tiro
 
@@ -129,6 +124,13 @@ obstaculosConsecutivosQueSupera' tiro (obstaculo:obstaculos)
 --PUNTO 4c)
 paloMasUtil :: Jugador -> [Obstaculo] -> Palo
 paloMasUtil jugador obstaculos = maximoSegun (flip obstaculosConsecutivosQueSupera obstaculos.golpe jugador) palos
+
+
+maximoSegun f = foldl1 (mayorSegun f)
+
+mayorSegun f a b
+  | f a > f b = a
+  | otherwise = b
 
 
 --PUNTO 5)
