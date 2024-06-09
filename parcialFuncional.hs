@@ -11,13 +11,6 @@ data Item = Item{
     valor :: Int
 }deriving (Show,Eq)
 
-maximoSegun f = foldl1 (mayorSegun f)
-
-mayorSegun :: (Investigador -> Int) -> Investigador -> Investigador -> Investigador
-mayorSegun f a b 
-    | f a > f b = a
-    | otherwise = b
-
 --1.a)
 modificarCordura :: (Int -> Int) -> Investigador -> Investigador
 modificarCordura modificacion investigador = investigador{cordura= (modificacion.cordura) investigador}
@@ -61,6 +54,28 @@ valorMaximoitems :: [Item] -> Int
 valorMaximoitems [] = 0
 valorMaximoitems items = maximum  (map valor items)
 
+potencial :: Investigador -> Int
+potencial investigador = (cordura investigador) * (1 + length (sucesosEvitados investigador)) + valorMaximoitems (items investigador)
+
+
+maximoSegun potencial = foldl1 (mayorSegun potencial) 
+
+mayorSegun f a b 
+    | f a > f b = a
+    | otherwise = b
+
+{-
+mayorSegun f a b 
+    | f a > f b = a
+    | otherwise = b
+
+maximoSegun f = foldl1 (mayorSegun f)
+
+mayorSegun f a b 
+    | f a > f b = a
+    | otherwise = b
+
+-}
 
 --4) usar deltaSegun
 
@@ -71,7 +86,8 @@ deltaEnLaCorduraTotal :: Int -> [Investigador] -> Int
 deltaEnLaCorduraTotal puntos =  sum. map (deltaSegun cordura (enloquezca puntos)) 
 
 --4.b)
-
+deltaEnPotencial :: [Investigador] -> Investigador
+deltaEnPotencial investigadores = undefined
 
 
 
