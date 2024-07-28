@@ -1,11 +1,12 @@
 module Lib where
 import PdePreludat
 
--- PARTE A 
-data Perro = Perro{
+-- parte A --
+
+data Perrito = Perrito{
     raza :: String,
-    juguetesFavoritos :: [Juguete],
-    tiempo :: Number,
+    juguetes :: [Juguete],
+    tiempoEnGuarderia :: Number,
     energia :: Number
 }deriving(Show,Eq)
 
@@ -18,92 +19,92 @@ data Guarderia = Guarderia{
 
 data Actividad = Actividad{
     ejercicio :: Ejercicio,
-    tiempoRutina :: Number
+    tiempoEjercicio :: Number
 }deriving(Show,Eq)
 
-type Ejercicio = Perro -> Perro
+type Ejercicio = Perrito -> Perrito
 
-modificarEnergia :: (Number -> Number) -> Perro -> Perro 
-modificarEnergia transformacion perro = perro{energia=(transformacion.energia)perro}
+jugarEj :: Ejercicio
+jugarEj = modificarEnergia (subtract 10) 
 
-jugar :: Ejercicio
-jugar  = modificarEnergia (max 0 . flip (-) 10) 
+ladrarEj :: Number -> Ejercicio
+ladrarEj ladridos perrito = perrito{energia = energia perrito + (ladridos `div` 2)}
 
-ladrar :: Number -> Ejercicio
-ladrar ladrido = modificarEnergia (+ (ladrido `div` 2))
+regalarEj :: Juguete -> Ejercicio
+regalarEj nuevoToy perrito = perrito{juguetes = nuevoToy : juguetes perrito}
 
-regalar :: String -> Ejercicio
-regalar nuevoJuguete perro = perro{juguetesFavoritos=nuevoJuguete:juguetesFavoritos perro}
+modificarEnergia :: (Number -> Number) -> Perrito -> Perrito
+modificarEnergia transformacion perrito = perrito{energia=(max 0.transformacion.energia)perrito}
 
-diaDeSpa :: Ejercicio
-diaDeSpa perro 
-    | tiempo perro >= 50 || (raza perro) `elem` razasExtravagante = (cambiarEnergia 100 .regalar "peine de goma") perro 
-    | otherwise = perro
+razasExtravagantes = ["dalmata","pomerania"]
 
-razasExtravagante :: [String]
-razasExtravagante = ["dalmata","pomerania"]
+diaDeSpaEj :: Ejercicio 
+diaDeSpaEj perrito 
+    | ((<50).tiempoEnGuarderia) perrito || esDeRazaExtravagante (raza perrito) = regalarEj "peine de goma" . modificarEnergia (+ (100 - energia perrito)) $ perrito
+    | otherwise = perrito
 
-cambiarEnergia :: Number -> Ejercicio 
-cambiarEnergia valor perro = perro{energia=valor}
+esDeRazaExtravagante :: String  -> Bool
+esDeRazaExtravagante razaPerrito = elem razaPerrito razasExtravagantes
 
-diaDeCampo :: Ejercicio
-diaDeCampo  = perderJuguete . jugar
+diaDeCampoEj :: Ejercicio
+diaDeCampoEj perrito = perrito{juguetes=tail.juguetes $ perrito}
 
-perderJuguete :: Ejercicio
-perderJuguete perro = perro{juguetesFavoritos= tail (juguetesFavoritos perro)}
+-- Perritos modelos
+zara :: Perrito
+zara = Perrito "dalmata" ["pelota","mantita"] 90 80
 
-zara :: Perro
-zara = Perro "dalmata" ["pelota","mantita"] 90 80
-
-guarderiaPdePerritos :: Guarderia
-guarderiaPdePerritos = Guarderia{
-    nombre = "Guarderia P de perritos",
-    rutina = [Actividad jugar 30 ,Actividad (ladrar 18) 20 , Actividad (regalar "pelota") 0, Actividad diaDeSpa 120, Actividad diaDeCampo 720]
+guarderiaPDePerritos :: Guarderia
+guarderiaPDePerritos = Guarderia{
+    nombre = "Guarderia P de Perritos",
+    rutina = [jugar, ladrar,regalarPelota, diaDeSpa, diaDeCampo]
 }
+jugar :: Actividad
+jugar = Actividad jugarEj 30
 
--- PARTE B
+ladrar :: Actividad
+ladrar = Actividad (ladrarEj 18) 20
 
--- Saber si un perro puede estar en una guardería. 
--- Para eso, el tiempo de permanencia tiene que ser mayor que el de la rutina
-puedeEstarEnGuarderia :: Perro -> Guarderia ->  Bool 
-puedeEstarEnGuarderia perro guarderia = tiempo perro > (sum . map tiempoRutina . rutina) guarderia
+regalarPelota :: Actividad
+regalarPelota = Actividad (regalarEj "pelota") 0
 
--- Reconocer a perros responsables. Estos serían los que aún 
--- después de pasar un día de campo siguen teniendo más de 3 juguetes.
+diaDeSpa :: Actividad
+diaDeSpa = Actividad diaDeSpaEj 120
 
-perrosResponsables :: Perro -> Bool
-perrosResponsables = (>= 3). length . juguetesFavoritos . diaDeCampo
+diaDeCampo :: Actividad
+diaDeCampo = Actividad diaDeCampoEj 720
 
--- Que un perro realice una rutina de la guardería (que realice todos sus ejercicios). 
--- Para eso, el tiempo de la rutina no puede ser mayor al tiempo de permanencia. 
--- En caso de que esta condición no se cumpla, el perro no hace nada
+-- parte B --
+puedeEstarEnGuarderia :: Perrito -> Guarderia -> Bool
+puedeEstarEnGuarderia perrito guarderia = tiempoEnGuarderia perrito > tiempoRutina guarderia
 
-realizarRutina :: Perro -> Guarderia -> Perro 
-realizarRutina perro guarderia 
-    | puedeEstarEnGuarderia perro guarderia = foldl (flip aplicarActividad) perro (rutina guarderia)
-    | otherwise = perro
+tiempoRutina :: Guarderia -> Number
+tiempoRutina = sum . map tiempoEjercicio . rutina
 
-aplicarActividad :: Actividad -> Perro -> Perro 
-aplicarActividad actividad perro = (ejercicio actividad) perro
+perroResponsable :: Perrito -> Bool
+perroResponsable  = (>3). length . juguetes . diaDeCampoEj 
 
--- Dados unos perros, reportar todos los que quedan cansados después de realizar la rutina de una guardería. 
--- Es decir, que su energía sea menor a 5 luego de realizar todos los ejercicios
+realizarRutina :: Perrito -> Guarderia -> Perrito
+realizarRutina perrito guarderia 
+    | puedeEstarEnGuarderia perrito guarderia = hacerRutina perrito (rutina guarderia)
+    | otherwise = perrito
 
-perrosCansados :: [Perro] -> Guarderia -> [Perro]
-perrosCansados perros guarderia = filter (flip quedaCansado guarderia) perros
+hacerRutina :: Perrito -> [Actividad] -> Perrito
+hacerRutina perrito = foldl (flip($)) perrito . map ejercicio 
 
-perrosCansados' :: [Perro] -> Guarderia -> [Perro]
-perrosCansados' perros guarderia = filter ((<5). energia . flip realizarRutina guarderia) perros
+perrosCansados :: Guarderia -> [Perrito] -> [Perrito] 
+perrosCansados guarderia = filter perritoCansado . perritosHacenRutina guarderia
 
-quedaCansado :: Perro -> Guarderia ->  Bool 
-quedaCansado perro =  (< 5) . energia. realizarRutina perro
+perritosHacenRutina :: Guarderia -> [Perrito] -> [Perrito]
+perritosHacenRutina guarderia = map (flip realizarRutina guarderia)
 
--- PARTE C
-pi :: Perro
-pi = Perro "labrador" infinitasSogitas 314 159
+perritoCansado :: Perrito -> Bool
+perritoCansado = (<5).energia
 
-infinitasSogitas :: [Juguete]
-infinitasSogitas =  map show [1..]
+
+
+
+
+
 
 
 
