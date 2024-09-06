@@ -1,7 +1,6 @@
 module Lib where
 import PdePreludat
 
-
 data Guantelete = Guantelete{
     material :: String,
     gemas :: [Gema]
