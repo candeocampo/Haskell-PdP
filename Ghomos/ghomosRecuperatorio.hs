@@ -1,6 +1,8 @@
 module Library where
 import PdePreludat
 
+-- enunciado: https://www.utnianos.com.ar/foro/attachment.php?aid=23764
+
 data Material = Material{
     nombre :: String,
     calidad :: Number
